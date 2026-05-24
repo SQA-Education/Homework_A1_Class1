@@ -446,7 +446,6 @@ setTimeout(()=>{fb.style.display='none'},1200);
 initVocab();
 
 // --- WRITING ---
-// --- WRITING ---
 function countWords(){const t=document.getElementById('writingText').value.trim();
 document.getElementById('wc').textContent=t?t.split(/\s+/).filter(Boolean).length:0}
 
@@ -664,6 +663,7 @@ function submitToTeacher(){
   const pct=Math.round((sc.l+sc.v+sc.w+sc.s+sc.g)/57*100);
   const wt=writingText||document.getElementById('writingText').value.trim()||'';
   const st=spokenTranscript||document.getElementById('speakTranscriptText').textContent||'';
+  const teacher=document.getElementById('teacherName').value||'';
 
   // Silent POST submission (same pattern as A2 model — no popup)
   const form=document.createElement('form');
@@ -683,7 +683,7 @@ function submitToTeacher(){
     'entry.543147037':pct+'%',
     'entry.301386877':wt,
     'entry.879060890':st,
-    'entry.1451249480':'A1'
+    'entry.1451249480':teacher
   };
   Object.keys(fields).forEach(key=>{
     const input=document.createElement('input');
