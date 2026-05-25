@@ -236,7 +236,7 @@ Escribe 4 oraciones sobre ti. | اكتب 4 جمل عن نفسك. | Escreva 4 fra
 <div class="progress"><div class="progress-bar" style="width:80%"></div></div>
 <h2>🎤 4. Speaking <span>— Practice Greetings</span></h2>
 <div class="speaking-prompt">
-<p><strong>Say all 5 sentences out loud when recording (up to 15 seconds):</strong></p>
+<p><strong>Say all 5 sentences out loud when recording (up to 30 seconds):</strong></p>
 <p style="margin-top:8px">
 1. Hello! Good evening!<br>
 2. My name is [your name].<br>
@@ -246,7 +246,7 @@ Escribe 4 oraciones sobre ti. | اكتب 4 جمل عن نفسك. | Escreva 4 fra
 </p>
 </div>
 <div class="trilingual">
-Grábate diciendo estas oraciones (máximo 15 segundos). | سجل نفسك وأنت تقول هذه الجمل (حتى 15 ثانية). | Grave-se dizendo estas frases (até 15 segundos).
+Grábate diciendo estas oraciones (máximo 30 segundos). | سجل نفسك وأنت تقول هذه الجمل (حتى 30 ثانية). | Grave-se dizendo estas frases (até 30 segundos).
 </div>
 <div class="status-text" id="statusText">Tap the microphone to start recording</div>
 <div class="timer" id="recTimer" style="display:none">0:00</div>
@@ -312,8 +312,7 @@ function setTeacher(sel){var opt=sel.options[sel.selectedIndex];var t=document.g
 
 const SESSION='Class 1';
 const COURSE='PS1 (A1)';
-// Classes 1-4 = 15s, 5-8 = 20s, 9-12 = 25s, 13-14 = 30s
-const SPEAKING_LIMIT=15;
+const SPEAKING_LIMIT=30;
 let sn='',sClass='',sc={l:0,v:0,w:0,s:0,g:0};
 let writingText='',writingFeedbackText='',spokenTranscript='';
 const answers={lq1:'a',lq2:'a',lq3:'b'};
@@ -347,18 +346,15 @@ function getVoice(gender){
   const voices=synth.getVoices();
   const eng=voices.filter(v=>v.lang.startsWith('en'));
   if(!eng.length) return voices[0]||null;
-  // Try to find a specifically gendered voice by name keywords
   const femaleNames=/samantha|karen|fiona|victoria|zira|moira|tessa|allison|ava|susan|sara|female/i;
   const maleNames=/daniel|david|james|alex|fred|tom|gordon|oliver|male/i;
   if(gender==='f'){
     const fVoice=eng.find(v=>femaleNames.test(v.name)&&!/male/i.test(v.name));
     if(fVoice) return fVoice;
-    // Fallback: pick first voice (pitch will differentiate)
     return eng[0];
   } else {
     const mVoice=eng.find(v=>maleNames.test(v.name)&&!/female/i.test(v.name));
     if(mVoice) return mVoice;
-    // Fallback: pick a different voice from female's fallback
     return eng[1]||eng[0];
   }
 }
@@ -369,7 +365,6 @@ function speakLine(){
   const isSara=(line.s==='Sara');
   utterance.voice=getVoice(isSara?'f':'m');
   utterance.rate=isSara?0.9:0.8;
-  // Use more extreme pitch difference so they always sound distinct even on same voice
   utterance.pitch=isSara?1.4:0.6;
   utterance.onend=()=>{dIdx++;setTimeout(speakLine,600)};
   synth.speak(utterance);
@@ -465,27 +460,23 @@ function checkWriting(){
     return;
   }
 
-  // Session 1 grammar point: subject pronouns (I, You, He, She, We, They)
-  const pronouns=[/\bi\b/i,/\byou\b/i,/\bhe\b/i,/\bshe\b/i,/\bwe\b/i,/\bthey\b/i];
-  const usedPronouns=pronouns.filter(p=>p.test(t));
-  if(usedPronouns.length>=2){pts+=5;details.push('✅ Used subject pronouns correctly (grammar point)');}
-  else if(usedPronouns.length===1){pts+=3;details.push('⚠️ Used 1 pronoun — try using more: I, You, He, She...');}
-  else{pts+=1;details.push('❌ Try to use subject pronouns: I, You, He, She, We, They');}
-
-  // Key phrases — loose partial credit
-  if(/my name is/i.test(t)){pts+=4;details.push('✅ "My name is..."');}
-  else if(/name/i.test(t)){pts+=2;details.push('⚠️ Mention your name ("My name is...")');}
+  // Score the FOUR things the task actually asks for: name, where from, where you live, what you like.
+  // 5 points each (full), 3 points partial. No hidden pronoun criterion.
+  if(/my name is/i.test(t)){pts+=5;details.push('✅ "My name is..."');}
+  else if(/name/i.test(t)){pts+=3;details.push('⚠️ Try the full phrase: "My name is..."');}
   else{details.push('❌ Missing "My name is..."');}
 
-  if(/i am from|i'm from/i.test(t)){pts+=4;details.push('✅ "I am from..."');}
-  else if(/from/i.test(t)){pts+=2;details.push('⚠️ Mention where you are from');}
+  if(/i am from|i'm from/i.test(t)){pts+=5;details.push('✅ "I am from..."');}
+  else if(/from/i.test(t)){pts+=3;details.push('⚠️ Try the full phrase: "I am from..."');}
   else{details.push('❌ Missing "I am from..."');}
 
-  if(/i live in/i.test(t)){pts+=4;details.push('✅ "I live in..."');}
-  else if(/live/i.test(t)){pts+=2;details.push('⚠️ Mention where you live');}
+  if(/i live in/i.test(t)){pts+=5;details.push('✅ "I live in..."');}
+  else if(/live/i.test(t)){pts+=3;details.push('⚠️ Try the full phrase: "I live in..."');}
   else{details.push('❌ Missing "I live in..."');}
 
-  if(/i like/i.test(t)){pts+=3;details.push('✅ "I like..."');}
+  if(/i like/i.test(t)){pts+=5;details.push('✅ "I like..."');}
+  else if(/like/i.test(t)){pts+=3;details.push('⚠️ Try the full phrase: "I like..."');}
+  else{details.push('❌ Missing "I like..."');}
 
   sc.w=Math.min(20,Math.max(0,pts));
   writingFeedbackText=details.join(' | ')+' | Score: '+sc.w+'/20';
@@ -495,7 +486,7 @@ function checkWriting(){
   details.forEach(d=>msg+='<li>'+d+'</li>');
   msg+='</ul>';
   if(sc.w>=16) msg+='<p style="color:#27ae60;font-weight:600">Excellent work! 🌟</p>';
-  else if(sc.w>=10) msg+='<p>Good effort! Try to include all four phrases next time.</p>';
+  else if(sc.w>=10) msg+='<p>Good effort! Try to include all four sentences next time.</p>';
   else msg+='<p>Keep trying! Use: "My name is... I am from... I live in... I like..."</p>';
   fb.innerHTML=msg;fb.style.display='block';
   document.getElementById('writingNext').disabled=false;
@@ -537,11 +528,15 @@ function startRec(){
 
   recognition=new SpeechRecognition();
   recognition.continuous=false;
-  recognition.interimResults=false;
+  recognition.interimResults=true;
   recognition.lang='en-US';
   recognition.onresult=function(e){
-    spokenTranscript+=e.results[0][0].transcript+' ';
-    document.getElementById('speakTranscriptText').textContent=spokenTranscript.trim();
+    var interim='';
+    for(var i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) spokenTranscript+=e.results[i][0].transcript+' ';
+      else interim+=e.results[i][0].transcript;
+    }
+    document.getElementById('speakTranscriptText').textContent=(spokenTranscript+interim).trim();
     document.getElementById('speakTranscriptBox').style.display='block';
   };
   recognition.onerror=function(){};
@@ -557,7 +552,7 @@ function stopRec(){
   document.getElementById('micBtn').classList.remove('recording');
   document.getElementById('statusText').textContent='Checking your speaking...';
   document.getElementById('recTimer').style.display='none';
-  setTimeout(()=>scoreSpeaking(),300);
+  setTimeout(()=>scoreSpeaking(),1500);
 }
 
 function scoreSpeaking(){
@@ -565,7 +560,6 @@ function scoreSpeaking(){
   const hasRealSpeech=isRealSpeech(t);
   let pts=0;const details=[];
 
-  // No points for nonsense/no words — but still always allow continue and submit
   if(hasRealSpeech){
     if(/hello|good evening|good morning|good afternoon|hi\b/i.test(t)){pts+=4;details.push('✅ Said a greeting');}
     else{details.push('❌ Missing a greeting — say "Hello! Good evening!"');}
@@ -595,7 +589,6 @@ function scoreSpeaking(){
   else msg+='<p>Try again — speak clearly and say all 5 sentences.</p>';
   msg+='<button class="btn btn-secondary" onclick="resetSpeaking()" style="margin-top:10px">🔄 Try Again</button>';
   fb.innerHTML=msg;fb.style.display='block';
-  // Always allow continuing — score 0 still submits
   document.getElementById('speakNext').disabled=false;
   document.getElementById('statusText').textContent='Done! Review your score below.';
 }
@@ -658,45 +651,45 @@ document.getElementById('scG').textContent=sc.g+'/8';
 goTo('results');
 }
 
-
+let submitted=false;
 function submitToTeacher(){
+  if(submitted)return;
+  submitted=true;
+  var btn=document.getElementById('submitBtn');
+  if(btn){btn.disabled=true;btn.textContent='Submitting...';}
   const pct=Math.round((sc.l+sc.v+sc.w+sc.s+sc.g)/57*100);
   const wt=writingText||document.getElementById('writingText').value.trim()||'';
   const st=spokenTranscript||document.getElementById('speakTranscriptText').textContent||'';
   const teacher=document.getElementById('teacherName').value||'';
 
-  // Silent POST submission (same pattern as A2 model — no popup)
-  const form=document.createElement('form');
-  form.method='POST';
-  form.action='https://docs.google.com/forms/d/e/1FAIpQLSfxgLZofrw5wLjtEaU9K0xgJWqztxigBXxpHCXe2Ndi3UOpnQ/formResponse';
-  form.target='hidden_iframe';
-  form.style.display='none';
-  const fields={
-    'entry.154629934':sn||document.getElementById('studentName').value.trim(),
-    'entry.771629595':sClass||document.getElementById('className').value||'',
-    'entry.1564061356':SESSION,
-    'entry.1994438750':sc.l+'/3',
-    'entry.1169985852':sc.v+'/6',
-    'entry.66378887':sc.w+'/20',
-    'entry.665897330':sc.s+'/20',
-    'entry.1528226896':sc.g+'/8',
-    'entry.543147037':pct+'%',
-    'entry.301386877':wt,
-    'entry.879060890':st,
-    'entry.1451249480':teacher
-  };
-  Object.keys(fields).forEach(key=>{
-    const input=document.createElement('input');
-    input.type='hidden';input.name=key;input.value=fields[key];
-    form.appendChild(input);
-  });
-  let iframe=document.getElementById('hidden_iframe');
-  if(!iframe){iframe=document.createElement('iframe');iframe.name='hidden_iframe';iframe.id='hidden_iframe';iframe.style.display='none';document.body.appendChild(iframe);}
-  document.body.appendChild(form);
-  form.submit();
-  form.remove();
-  document.getElementById('submitSuccess').style.display='block';
-  document.getElementById('submitBtn').disabled=true;
+  var formData=new FormData();
+  formData.append('entry.154629934',sn||document.getElementById('studentName').value.trim());
+  formData.append('entry.771629595',sClass||document.getElementById('className').value||'');
+  formData.append('entry.1564061356',SESSION);
+  formData.append('entry.1994438750',sc.l+'/3');
+  formData.append('entry.1169985852',sc.v+'/6');
+  formData.append('entry.66378887',sc.w+'/20');
+  formData.append('entry.665897330',sc.s+'/20');
+  formData.append('entry.1528226896',sc.g+'/8');
+  formData.append('entry.543147037',pct+'%');
+  formData.append('entry.301386877',wt);
+  formData.append('entry.879060890',st);
+  formData.append('entry.1451249480',teacher);
+
+  function showSuccess(){
+    document.getElementById('submitSuccess').style.display='block';
+    if(btn){btn.textContent='Submitted ✓';btn.style.background='#27ae60';btn.disabled=true;}
+  }
+  function showFailure(){
+    submitted=false;
+    if(btn){btn.disabled=false;btn.textContent='Failed - Tap to Retry';btn.style.background='#e74c3c';}
+  }
+  // 6s timeout fallback for mobile (no-cors never errors on success)
+  var done=false;
+  var timeoutId=setTimeout(function(){if(!done){done=true;showSuccess();}},6000);
+  fetch('https://docs.google.com/forms/d/e/1FAIpQLSfxgLZofrw5wLjtEaU9K0xgJWqztxigBXxpHCXe2Ndi3UOpnQ/formResponse',{method:'POST',mode:'no-cors',body:formData})
+    .then(function(){if(done)return;done=true;clearTimeout(timeoutId);showSuccess();})
+    .catch(function(){if(done)return;done=true;clearTimeout(timeoutId);showFailure();});
 }
 
 </script>
